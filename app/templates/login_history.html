@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>🔐 Login History</h2>
+<table style="width: 100%; max-width: 700px; border-collapse: collapse; margin-top: 20px;">
+  <tr style="background: #f1f5f9; font-weight: 600;">
+    <th style="padding: 8px; text-align: left;">IP Address</th>
+    <th style="padding: 8px; text-align: left;">Timestamp</th>
+  </tr>
+  {% for event in events %}
+  <tr style="border-bottom: 1px solid #e5e7eb;">
+    <td style="padding: 8px;">{{ event.ip_address }}</td>
+    <td style="padding: 8px;">{{ event.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>API Documentation</h2>
+
+<p>This API allows you to verify emails programmatically.</p>
+
+<h3>🔐 Your API Key</h3>
+<p><strong>{{ user.api_key }}</strong></p>
+
+<h3>📨 Endpoint</h3>
+<pre>POST /api/verify</pre>
+
+<h3>🧾 Parameters</h3>
+<ul>
+  <li><strong>api_key</strong> (string, required)</li>
+  <li><strong>email</strong> (string, required)</li>
+</ul>
+
+<h3>📤 Example Request (cURL)</h3>
+<pre>
+curl -X POST {{ url_for('api_verify', _external=True) }} \
+     -d "api_key={{ user.api_key }}" \
+     -d "email=test@example.com"
+</pre>
+
+<h3>✅ Sample Response</h3>
+<pre>
+{
+  "input": "test@example.com",
+  "smtp_status": "Valid",
+  "status": "Deliverable",
+  "score": 95
+}
+</pre>
+{% endblock %}

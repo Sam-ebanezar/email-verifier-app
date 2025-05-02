@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>📈 Deliverability by Domain</h2>
+
+<canvas id="domainChart" width="800" height="400" style="margin-top: 30px;"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('domainChart').getContext('2d');
+    const domainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels|tojson }},
+            datasets: [{
+                label: 'Deliverability Rate (%)',
+                data: {{ data|tojson }},
+                backgroundColor: '#3b82f6'
+            }]
+        },
+        options: {
+            responsive: true,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Deliverability %'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

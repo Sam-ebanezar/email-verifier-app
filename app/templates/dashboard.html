@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verifier Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 70px;
+            height: 100%;
+            background-color: #1e40af;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+        .main {
+            margin-left: 70px;
+            padding: 30px;
+        }
+        .modal {
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px 40px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        .modal h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .options button {
+            padding: 10px 15px;
+            border: 1px solid #cbd5e1;
+            background-color: white;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .options button.active,
+        .options button:hover {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+        }
+        .upload-area {
+            border: 2px dashed #60a5fa;
+            background-color: #f0f9ff;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 12px;
+        }
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        .upload-area label {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        .results {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .results a {
+            display: inline-block;
+            margin: 8px;
+            padding: 10px 18px;
+            background-color: #e0f2fe;
+            border-radius: 6px;
+            color: #0369a1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .results a:hover {
+            background-color: #bae6fd;
+        }
+        .success {
+            color: #10b981;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div>📄</div>
+        <div>📤</div>
+        <div>📥</div>
+        <div>⚙️</div>
+    </div>
+    <div class="main">
+        <div class="modal">
+            <h2>Import contacts</h2>
+            <div class="options">
+                <button>Google Sheets</button>
+                <button class="active">Import a CSV</button>
+                <button>Contact list</button>
+                <button>Copy / paste</button>
+            </div>
+            <div class="upload-area">
+                <p>Drag a CSV file here or click the button below<br>to upload your mail verification list</p>
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="file" name="file" id="fileInput" accept=".csv,.txt,.xlsx" required>
+                    <label for="fileInput">Import a CSV</label>
+                </form>
+            </div>
+            {% if uploads %}
+            <div class="results">
+                <p class="success">✅ Previous Uploads</p>
+                {% for upload in uploads %}
+                    <a href="{{ url_for('download', filename=upload.result_filename) }}" download>{{ upload.filename }} (Status: <span data-upload-id="{{ upload.id }}">
+<span data-upload-id="{{ upload.id }}">
+    {% if upload.status == 'Processing' %}
+        🕒 Processing...
+    {% elif upload.status == 'Completed' %}
+        ✅ Completed
+    {% elif upload.status == 'Failed' %}
+        ❌ Failed
+    {% else %}
+        {{ upload.status }}
+    {% endif %}
+</span>
+</span>)</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="results">
+                <a class="success" href="{{ url_for('api_docs') }}">📘 View API Documentation</a>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const statusElements = document.querySelectorAll("[data-upload-id]");
+    statusElements.forEach((el) => {
+        const id = el.getAttribute("data-upload-id");
+        const interval = setInterval(() => {
+            fetch(`/upload-status/${id}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.status !== "Processing") {
+                        el.innerText = "Status: " + data.status;
+                        clearInterval(interval);
+                    } else {
+                        el.innerText = "Status: Processing...";
+                    }
+                });
+        }, 3000);
+    });
+});
+</script>
+
+<div id="toast" style="display: none; position: fixed; bottom: 30px; right: 30px; background: #22c55e; color: white; padding: 15px 20px; border-radius: 8px; font-weight: 500; box-shadow: 0 0 10px rgba(0,0,0,0.2); z-index: 9999;">
+  ✅ File verification completed!
+</div>
+
+<script>
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.style.display = "block";
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 4000);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const statusElements = document.querySelectorAll("[data-upload-id]");
+    statusElements.forEach((el) => {
+        const id = el.getAttribute("data-upload-id");
+        const interval = setInterval(() => {
+            fetch(`/upload-status/${id}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.status === "Completed") {
+                        el.innerText = "✅ Completed";
+                        showToast("File verification completed!");
+                        clearInterval(interval);
+                    } else if (data.status === "Failed") {
+                        el.innerText = "❌ Failed";
+                        showToast("File processing failed.");
+                        clearInterval(interval);
+                    } else {
+                        el.innerText = "🕒 Processing...";
+                    }
+                });
+        }, 3000);
+    });
+});
+</script>
+
+<audio id="chime" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.wav" preload="auto"></audio>
+
+<style>
+#toast {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: -400px;
+    background: #22c55e;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    z-index: 9999;
+    transition: right 0.4s ease;
+}
+#toast.toast-slide {
+    right: 30px;
+}
+</style>
+
+<div id="toast">✅ File verification completed!</div>
+
+<script>
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    const chime = document.getElementById("chime");
+    toast.innerText = message;
+    toast.style.display = "block";
+    toast.classList.add("toast-slide");
+    chime.play();
+    setTimeout(() => {
+        toast.classList.remove("toast-slide");
+        setTimeout(() => { toast.style.display = "none"; }, 400);
+    }, 4000);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const statusElements = document.querySelectorAll("[data-upload-id]");
+    statusElements.forEach((el) => {
+        const id = el.getAttribute("data-upload-id");
+        const interval = setInterval(() => {
+            fetch(`/upload-status/${id}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.status === "Completed") {
+                        el.innerText = "✅ Completed";
+                        showToast("File verification completed!");
+                        clearInterval(interval);
+                    } else if (data.status === "Failed") {
+                        el.innerText = "❌ Failed";
+                        showToast("File processing failed.");
+                        clearInterval(interval);
+                    } else {
+                        el.innerText = "🕒 Processing...";
+                    }
+                });
+        }, 3000);
+    });
+});
+</script>
+</body>
+
+
+
+</html>

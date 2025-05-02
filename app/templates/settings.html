@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>⚙️ Settings</h2>
+
+<h3>Change Password</h3>
+<form method="POST">
+    <label for="current_password">Current Password:</label><br>
+    <input type="password" name="current_password" required><br><br>
+
+    <label for="new_password">New Password:</label><br>
+    <input type="password" name="new_password" required><br><br>
+
+    <label for="confirm_password">Confirm New Password:</label><br>
+    <input type="password" name="confirm_password" required><br><br>
+
+    <button type="submit">Update Password</button>
+</form>
+
+
+{% if user.otp_secret %}
+<hr>
+<h3>Two-Factor Authentication</h3>
+<p>2FA is currently <strong>enabled</strong> on your account.</p>
+<form method="POST" action="{{ url_for('disable_2fa') }}" onsubmit="return confirm('Are you sure you want to disable 2FA?')">
+    <button type="submit" style="background-color: #dc2626; color: white; padding: 10px 20px; border-radius: 6px;">Disable 2FA</button>
+</form>
+{% else %}
+<hr>
+<h3>Two-Factor Authentication</h3>
+<p>2FA is currently <strong>disabled</strong>.</p>
+<a href="{{ url_for('two_factor_setup') }}" class="api-link" style="margin-top: 10px; display: inline-block;">Enable 2FA</a>
+{% endif %}
+{% endblock %}
+

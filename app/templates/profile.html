@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>👤 Profile</h2>
+<ul>
+  <li><strong>Email:</strong> {{ user.email }}</li>
+  <li><strong>Role:</strong> {{ user.role }}</li>
+  <li><strong>Credits:</strong> {{ user.credits }}</li>
+  <li><strong>API Key:</strong> <code>{{ user.api_key }}</code></li>
+</ul>
+{% endblock %}

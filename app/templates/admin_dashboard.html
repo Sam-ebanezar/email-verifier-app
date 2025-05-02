@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+
+<h3>All Users</h3>
+<ul>
+{% for user in users %}
+    <li>{{ user.email }} - Role: {{ user.role }}</li>
+{% endfor %}
+</ul>
+
+<h3>All Uploads</h3>
+<ul>
+{% for upload in uploads %}
+    <li>{{ upload.user.email }} uploaded {{ upload.filename }} at {{ upload.upload_time }} - <a href="{{ url_for('dashboard.download', filename=upload.stored_filename) }}">Download</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

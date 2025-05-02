@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>📊 Your Analytics</h2>
+
+<canvas id="statsChart" width="600" height="300" style="margin-top: 30px;"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    const statsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Total Uploads', 'Completed', 'Failed'],
+            datasets: [{
+                label: 'Upload Statistics',
+                data: [{{ stats.total_uploads }}, {{ stats.completed }}, {{ stats.failed }}],
+                backgroundColor: ['#3b82f6', '#10b981', '#ef4444']
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+<div style="margin-top: 40px;">
+    <a href="{{ url_for('analytics_domains') }}" class="api-link">📊 View Domain Deliverability Chart</a><br><br>
+    <a href="{{ url_for('download_domain_summary') }}" class="api-link">📥 Download Domain Summary CSV</a>
+</div>
+{% endblock %}

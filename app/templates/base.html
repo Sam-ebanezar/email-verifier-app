@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verifier Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .topbar {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 15px 20px;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .topbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar {
+            position: fixed;
+            top: 55px;
+            left: 0;
+            width: 200px;
+            height: calc(100% - 55px);
+            background-color: #1e40af;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .sidebar a {
+            padding: 12px 20px;
+            width: 100%;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: #3749b4;
+        }
+        .content {
+            margin-left: 200px;
+            padding: 30px;
+            margin-top: 55px;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo">
+            <span>📧</span>
+            <span>Email Verifier Pro</span>
+        </div>
+        <div>
+            {{ current_user.email }} | <a href="{{ url_for('logout') }}" style="color: #facc15;">Logout</a>
+        </div>
+    </div>
+    <div class="sidebar">
+        <a href="{{ url_for('dashboard') }}">🏠 Dashboard</a>
+        <a href="{{ url_for('api_docs') }}">🔑 API Docs</a>
+        <a href="#">👤 Profile</a>
+        <a href="#">⚙️ Settings</a>
+        {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('admin_dashboard') }}">🛠️ Admin Panel</a>
+        {% endif %}
+    </div>
+    <div class="content">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+
+<audio id="chime" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.wav" preload="auto"></audio>
+
+<div id="toast" style="display:none;position:fixed;bottom:30px;right:-400px;background:#0ea5e9;color:white;padding:15px 20px;border-radius:8px;font-weight:500;box-shadow:0 0 10px rgba(0,0,0,0.2);z-index:9999;transition:right 0.4s ease;">
+  ✅ Notification!
+</div>
+
+<style>
+#toast.toast-slide { right: 30px; }
+</style>
+
+<script>
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    const chime = document.getElementById("chime");
+    toast.innerText = message;
+    toast.style.display = "block";
+    toast.classList.add("toast-slide");
+    chime.play();
+    setTimeout(() => {
+        toast.classList.remove("toast-slide");
+        setTimeout(() => { toast.style.display = "none"; }, 400);
+    }, 4000);
+}
+</script>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      {% for message in messages %}
+        showToast("{{ message }}");
+      {% endfor %}
+    });
+    </script>
+  {% endif %}
+{% endwith %}
+
+<audio id="chime" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.wav" preload="auto"></audio>
+
+<div id="toast" style="display:none;position:fixed;bottom:30px;right:-400px;background:#0ea5e9;color:white;padding:15px 20px;border-radius:8px;font-weight:500;box-shadow:0 0 10px rgba(0,0,0,0.2);z-index:9999;transition:right 0.4s ease;">
+  ℹ️ Notification!
+</div>
+
+<style>
+#toast.toast-slide { right: 30px; }
+</style>
+
+<script>
+function showToast(message, category) {
+    const toast = document.getElementById("toast");
+    const chime = document.getElementById("chime");
+
+    toast.style.backgroundColor = category === 'success' ? '#22c55e'
+        : category === 'error' ? '#ef4444'
+        : '#0ea5e9';
+
+    toast.innerText = (category === 'success' ? '✅ ' : category === 'error' ? '❌ ' : 'ℹ️ ') + message;
+    toast.style.display = "block";
+    toast.classList.add("toast-slide");
+    chime.play();
+
+    setTimeout(() => {
+        toast.classList.remove("toast-slide");
+        setTimeout(() => { toast.style.display = "none"; }, 400);
+    }, 4000);
+}
+</script>
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      {% for category, message in messages %}
+        showToast("{{ message }}", "{{ category }}");
+      {% endfor %}
+    });
+    </script>
+  {% endif %}
+{% endwith %}
+</body>
+
+
+</html>
