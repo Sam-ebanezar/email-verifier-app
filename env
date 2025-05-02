@@ -1,0 +1,13 @@
+# Flask App Secret
+SECRET_KEY=your_super_secret_key_here
+
+# Celery & Redis
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
+
+# Email Configuration
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USERNAME=your_email@example.com
+MAIL_PASSWORD=your_app_password

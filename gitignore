@@ -1,0 +1,34 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+venv/
+env/
+
+# Environment configuration
+.env
+
+# Flask cache
+instance/
+*.db
+
+# Logs and debug info
+*.log
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Jupyter (if used)
+.ipynb_checkpoints/
+
+# Uploaded results and user files
+uploads/
+static/results/
+
+# Redis data (if any)
+dump.rdb
